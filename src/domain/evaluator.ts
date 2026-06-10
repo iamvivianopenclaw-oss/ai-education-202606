@@ -8,6 +8,14 @@ function includesAny(input: string, keywords: string[]): boolean {
   return keywords.some((keyword) => input.includes(keyword.toLowerCase()));
 }
 
+function hasGasMention(input: string): boolean {
+  return includesAny(input, ["气泡", "冒泡", "气体"]);
+}
+
+function hasNegatedGasMention(input: string): boolean {
+  return includesAny(input, ["不会产生气泡", "没有气泡", "无气泡", "不冒泡", "不产生气体"]);
+}
+
 export function evaluateExpectation(experiment: Experiment, expectation: string): ExpectationEvaluation {
   const normalized = normalize(expectation);
 
@@ -31,7 +39,7 @@ export function evaluateExpectation(experiment: Experiment, expectation: string)
 
   const misconceptionHits = experiment.misconceptions.filter((misconception) => {
     if (misconception === "酸碱反应都会产生气泡") {
-      return normalized.includes("气泡") || normalized.includes("冒泡") || normalized.includes("气体");
+      return hasGasMention(normalized) && !hasNegatedGasMention(normalized);
     }
 
     return normalized.includes(misconception.toLowerCase());
@@ -58,7 +66,7 @@ export function evaluateExpectation(experiment: Experiment, expectation: string)
   }
 
   return {
-    status: matchedObservations.length > 0 ? "partial" : "empty",
+    status: "partial",
     matchedObservations,
     missingObservations,
     misconceptionHits,

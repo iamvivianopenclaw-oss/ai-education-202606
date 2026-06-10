@@ -13,6 +13,13 @@ describe("evaluateExpectation", () => {
     expect(result.misconceptionHits).toContain("酸碱反应都会产生气泡");
   });
 
+  it("does not flag negated gas language as the acid-base gas misconception", () => {
+    const result = evaluateExpectation(neutralization, "盐酸和氢氧化钠中和，不会产生气泡，酚酞会褪色");
+
+    expect(result.status).not.toBe("misconception");
+    expect(result.misconceptionHits).not.toContain("酸碱反应都会产生气泡");
+  });
+
   it("recognizes a complete carbon dioxide expectation", () => {
     const result = evaluateExpectation(co2, "会产生气泡，并且澄清石灰水变浑浊");
 
@@ -32,5 +39,12 @@ describe("evaluateExpectation", () => {
 
     expect(result.status).toBe("empty");
     expect(result.message).toContain("先写下你的预测");
+  });
+
+  it("treats non-empty unmatched expectations as partial", () => {
+    const result = evaluateExpectation(co2, "我觉得杯子会变重");
+
+    expect(result.status).toBe("partial");
+    expect(result.message).toContain("没有命中关键实验现象");
   });
 });

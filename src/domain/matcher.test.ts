@@ -16,6 +16,15 @@ describe("matcher", () => {
     expect(findExperimentByInput("硫在氧气中燃烧")).toBeUndefined();
   });
 
+  it.each([
+    ["二氧化碳", "co2-preparation"],
+    ["酚酞", "acid-base-neutralization"],
+    ["氧气", "oxygen-preparation"],
+    ["硫酸铜", "iron-copper-sulfate"]
+  ])("matches strong canonical cue %s", (input, expectedId) => {
+    expect(findExperimentByInput(input)?.id).toBe(expectedId);
+  });
+
   it("gets experiment by exact id", () => {
     expect(getExperimentById("oxygen-preparation")?.title).toBe("过氧化氢制取氧气");
   });
