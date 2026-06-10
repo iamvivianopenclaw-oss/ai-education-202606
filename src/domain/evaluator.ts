@@ -13,7 +13,7 @@ function hasGasMention(input: string): boolean {
 }
 
 function hasNegatedGasMention(input: string): boolean {
-  return includesAny(input, ["不会产生气泡", "没有气泡", "无气泡", "不冒泡", "不产生气体"]);
+  return /(?:不(?:会)?|没有|无)[^，。；、,.!?！？\s]{0,4}(?:气泡|冒泡|气体)/.test(input);
 }
 
 export function evaluateExpectation(experiment: Experiment, expectation: string): ExpectationEvaluation {

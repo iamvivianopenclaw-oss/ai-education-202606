@@ -13,12 +13,22 @@ describe("evaluateExpectation", () => {
     expect(result.misconceptionHits).toContain("酸碱反应都会产生气泡");
   });
 
-  it("does not flag negated gas language as the acid-base gas misconception", () => {
-    const result = evaluateExpectation(neutralization, "盐酸和氢氧化钠中和，不会产生气泡，酚酞会褪色");
+  it("still flags positive bubbling language as the acid-base gas misconception", () => {
+    const result = evaluateExpectation(neutralization, "盐酸和氢氧化钠中和会冒泡");
 
-    expect(result.status).not.toBe("misconception");
-    expect(result.misconceptionHits).not.toContain("酸碱反应都会产生气泡");
+    expect(result.status).toBe("misconception");
+    expect(result.misconceptionHits).toContain("酸碱反应都会产生气泡");
   });
+
+  it.each(["不会产生气泡", "不会冒泡", "没有气泡", "无气泡", "不产生气体"])(
+    "does not flag negated gas language %s as the acid-base gas misconception",
+    (negatedGasPhrase) => {
+      const result = evaluateExpectation(neutralization, `盐酸和氢氧化钠中和，${negatedGasPhrase}，酚酞会褪色`);
+
+      expect(result.status).not.toBe("misconception");
+      expect(result.misconceptionHits).not.toContain("酸碱反应都会产生气泡");
+    }
+  );
 
   it("recognizes a complete carbon dioxide expectation", () => {
     const result = evaluateExpectation(co2, "会产生气泡，并且澄清石灰水变浑浊");
