@@ -66,3 +66,30 @@ export interface ProjectFeedback {
   clarity: "清楚" | "一般" | "需要改进";
   suggestion: string;
 }
+
+export type VisualPhase = "setup" | "reaction" | "observation" | "test" | "conclusion";
+export type BubbleIntensity = "none" | "soft" | "medium" | "strong";
+export type TurbidityLevel = "clear" | "misty" | "cloudy";
+export type FlameState = "none" | "ember" | "rekindled";
+
+export interface VisualSceneState {
+  vessel: "test-tube" | "beaker" | "gas-generator";
+  liquidColor: string;
+  secondaryLiquidColor?: string;
+  bubbleIntensity: BubbleIntensity;
+  turbidity: TurbidityLevel;
+  solid?: "none" | "calcium-carbonate" | "iron-nail" | "copper-coating" | "manganese-dioxide";
+  colorChange?: "none" | "fade" | "blue-fade" | "pink-to-clear";
+  flame: FlameState;
+  temperature?: "normal" | "warm";
+}
+
+export interface VisualTimelineStep {
+  id: string;
+  phase: VisualPhase;
+  title: string;
+  instruction: string;
+  observationCue: string;
+  knowledgeTag: string;
+  scene: VisualSceneState;
+}
