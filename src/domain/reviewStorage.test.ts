@@ -19,6 +19,24 @@ const card: MemoryCard = {
   shortAnswerPrompt: { question: "为什么变浑浊？", answer: "生成碳酸钙沉淀。" }
 };
 
+function loadFromStoredValue(value: unknown) {
+  const storage = {
+    getItem: vi.fn(() => JSON.stringify(value)),
+    setItem: vi.fn()
+  } as unknown as Storage;
+
+  return loadMemoryCards(storage);
+}
+
+function loadFromRawStorage(raw: string) {
+  const storage = {
+    getItem: vi.fn(() => raw),
+    setItem: vi.fn()
+  } as unknown as Storage;
+
+  return loadMemoryCards(storage);
+}
+
 describe("reviewStorage", () => {
   it("saves and loads memory cards", () => {
     const store = new Map<string, string>();
@@ -52,6 +70,34 @@ describe("reviewStorage", () => {
     saveMemoryCards(storage, cards);
 
     expect(loadMemoryCards(storage)).toHaveLength(12);
+  });
+
+  it.each([
+    ["non-string keyPhenomena item", { ...card, id: "bad-key-phenomena", keyPhenomena: ["产生气泡", 12] }],
+    ["null recall prompt item", { ...card, id: "bad-recall-null", recallPrompts: [null] }],
+    ["recall prompt missing answer", { ...card, id: "bad-recall-answer", recallPrompts: [{ question: "现象是什么？" }] }],
+    ["null createdAt from non-finite JSON value", { ...card, id: "bad-created-at-null", createdAt: Infinity }],
+    ["non-number createdAt", { ...card, id: "bad-created-at-string", createdAt: "1000" }],
+    ["string lastReviewedAt", { ...card, id: "bad-reviewed-at-string", lastReviewedAt: "3000" }],
+    ["null lastReviewedAt", { ...card, id: "bad-reviewed-at-null", lastReviewedAt: null }],
+    ["null lastReviewedAt from non-finite JSON value", { ...card, id: "bad-reviewed-at-infinity", lastReviewedAt: Infinity }]
+  ])("filters out stored cards with %s", (_caseName, malformedCard) => {
+    expect(loadFromStoredValue([card, malformedCard])).toEqual([card]);
+  });
+
+  it("filters out cards with non-finite timestamps from raw storage", () => {
+    const validRaw = JSON.stringify(card);
+    const nonFiniteCreatedAt = JSON.stringify({ ...card, id: "bad-created-at-finite" }).replace(
+      '"createdAt":1000',
+      '"createdAt":1e309'
+    );
+    const nonFiniteLastReviewedAt = JSON.stringify({
+      ...card,
+      id: "bad-reviewed-at-finite",
+      lastReviewedAt: 3000
+    }).replace('"lastReviewedAt":3000', '"lastReviewedAt":1e309');
+
+    expect(loadFromRawStorage(`[${validRaw},${nonFiniteCreatedAt},${nonFiniteLastReviewedAt}]`)).toEqual([card]);
   });
 
   it("does not throw when saving is unavailable", () => {

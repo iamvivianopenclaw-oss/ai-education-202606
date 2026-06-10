@@ -35,18 +35,39 @@ function isMemoryCard(value: unknown): value is MemoryCard {
     typeof candidate.id === "string" &&
     typeof candidate.experimentId === "string" &&
     typeof candidate.experimentTitle === "string" &&
-    typeof candidate.createdAt === "number" &&
-    Array.isArray(candidate.keyPhenomena) &&
+    isFiniteNumber(candidate.createdAt) &&
+    isOptionalFiniteNumber(candidate, "lastReviewedAt") &&
+    isStringArray(candidate.keyPhenomena) &&
     typeof candidate.equation === "string" &&
     typeof candidate.principle === "string" &&
     typeof candidate.misconception === "string" &&
     typeof candidate.safety === "string" &&
     typeof candidate.mnemonic === "string" &&
     Array.isArray(candidate.recallPrompts) &&
+    candidate.recallPrompts.every(isRecallPrompt) &&
     isMisconceptionPrompt(candidate.misconceptionPrompt) &&
     isShortAnswerPrompt(candidate.shortAnswerPrompt) &&
     (candidate.status === "new" || candidate.status === "due" || candidate.status === "mastered")
   );
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isOptionalFiniteNumber(value: object, key: keyof MemoryCard): boolean {
+  return !(key in value) || isFiniteNumber((value as Partial<MemoryCard>)[key]);
+}
+
+function isRecallPrompt(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+
+  const prompt = value as Partial<MemoryCard["recallPrompts"][number]>;
+  return typeof prompt.question === "string" && typeof prompt.answer === "string";
 }
 
 function isMisconceptionPrompt(value: unknown): boolean {
