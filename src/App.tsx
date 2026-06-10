@@ -95,6 +95,11 @@ export default function App() {
 
   function handleReactionInputChange(value: string) {
     setReactionInput(value);
+
+    const inputMatchedExperiment = findExperimentByInput(value);
+    if (inputMatchedExperiment) {
+      setSelectedId(inputMatchedExperiment.id);
+    }
   }
 
   function handleTogglePlay() {
