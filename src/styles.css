@@ -383,10 +383,8 @@ textarea {
 
 .iteration-note {
   margin-top: 12px;
-  padding: 12px;
-  border: 1px solid #dce5e0;
-  border-radius: 8px;
-  background: #f9fbfa;
+  padding: 4px 0 4px 12px;
+  border-left: 3px solid #7aa8a0;
 }
 
 .iteration-note p {
@@ -409,6 +407,35 @@ textarea {
   padding: 10px;
   border-radius: 8px;
   background: #f2f7f5;
+}
+
+.feedback-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.feedback-context strong {
+  margin-right: 2px;
+}
+
+.feedback-context em {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #5c4b13;
+  background: #fff2bf;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.feedback-context em:last-child {
+  color: #236f63;
+  background: #e2f1ed;
 }
 
 .feedback-list span {

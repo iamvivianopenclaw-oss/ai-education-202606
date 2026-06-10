@@ -1,10 +1,22 @@
 import { useState } from "react";
-import type { ProjectFeedback } from "../domain/types";
+import type { ExpectationEvaluation, ProjectFeedback } from "../domain/types";
+
+interface ProjectFeedbackEntry extends ProjectFeedback {
+  experimentTitle: string;
+  status: ExpectationEvaluation["status"];
+}
 
 interface ProjectFeedbackPanelProps {
-  feedbacks: ProjectFeedback[];
+  feedbacks: ProjectFeedbackEntry[];
   onSubmit: (feedback: Omit<ProjectFeedback, "id">) => void;
 }
+
+const STATUS_LABELS: Record<ExpectationEvaluation["status"], string> = {
+  accurate: "预测准确",
+  partial: "部分命中",
+  misconception: "存在误区",
+  empty: "未填写预测"
+};
 
 export function ProjectFeedbackPanel({ feedbacks, onSubmit }: ProjectFeedbackPanelProps) {
   const [clarity, setClarity] = useState<ProjectFeedback["clarity"]>("清楚");
@@ -49,7 +61,11 @@ export function ProjectFeedbackPanel({ feedbacks, onSubmit }: ProjectFeedbackPan
         <ul className="feedback-list">
           {feedbacks.map((feedback) => (
             <li key={feedback.id}>
-              <strong>{feedback.clarity}</strong>
+              <div className="feedback-context">
+                <strong>{feedback.experimentTitle}</strong>
+                <em>{STATUS_LABELS[feedback.status]}</em>
+                <em>{feedback.clarity}</em>
+              </div>
               <span>{feedback.suggestion}</span>
             </li>
           ))}

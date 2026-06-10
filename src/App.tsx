@@ -10,7 +10,7 @@ import { experiments } from "./domain/experiments";
 import { findExperimentByInput, getExperimentById } from "./domain/matcher";
 import { generateLearningReflection } from "./domain/reflection";
 import { generateTutorFeedback } from "./domain/tutor";
-import type { ProjectFeedback } from "./domain/types";
+import type { ExpectationEvaluation, ProjectFeedback } from "./domain/types";
 
 interface NotebookEntry {
   id: string;
@@ -22,12 +22,17 @@ interface NotebookEntry {
   skillTags: string[];
 }
 
+interface ProjectFeedbackEntry extends ProjectFeedback {
+  experimentTitle: string;
+  status: ExpectationEvaluation["status"];
+}
+
 export default function App() {
   const [selectedId, setSelectedId] = useState(experiments[0].id);
   const [reactionInput, setReactionInput] = useState("");
   const [expectation, setExpectation] = useState("");
   const [entries, setEntries] = useState<NotebookEntry[]>([]);
-  const [projectFeedbacks, setProjectFeedbacks] = useState<ProjectFeedback[]>([]);
+  const [projectFeedbacks, setProjectFeedbacks] = useState<ProjectFeedbackEntry[]>([]);
 
   const selectedExperiment = getExperimentById(selectedId) ?? experiments[0];
   const matchedExperiment = findExperimentByInput(reactionInput) ?? selectedExperiment;
@@ -37,6 +42,20 @@ export default function App() {
     () => generateLearningReflection(matchedExperiment, evaluation),
     [matchedExperiment, evaluation]
   );
+
+  function handleExperimentSelect(id: string) {
+    setSelectedId(id);
+    setReactionInput("");
+  }
+
+  function handleReactionInputChange(value: string) {
+    setReactionInput(value);
+
+    const inputMatchedExperiment = findExperimentByInput(value);
+    if (inputMatchedExperiment) {
+      setSelectedId(inputMatchedExperiment.id);
+    }
+  }
 
   function runFeedback() {
     setSelectedId(matchedExperiment.id);
@@ -57,7 +76,17 @@ export default function App() {
   }
 
   function submitProjectFeedback(feedbackInput: Omit<ProjectFeedback, "id">) {
-    setProjectFeedbacks((current) => [{ ...feedbackInput, id: `${Date.now()}` }, ...current].slice(0, 3));
+    setProjectFeedbacks((current) =>
+      [
+        {
+          ...feedbackInput,
+          id: `${Date.now()}`,
+          experimentTitle: matchedExperiment.title,
+          status: evaluation.status
+        },
+        ...current
+      ].slice(0, 3)
+    );
   }
 
   return (
@@ -69,11 +98,11 @@ export default function App() {
       </header>
       <div className="workspace-grid">
         <div className="left-column">
-          <ExperimentSelector experiments={experiments} selectedId={selectedId} onSelect={setSelectedId} />
+          <ExperimentSelector experiments={experiments} selectedId={selectedId} onSelect={handleExperimentSelect} />
           <StudentInputPanel
             reactionInput={reactionInput}
             expectation={expectation}
-            onReactionInputChange={setReactionInput}
+            onReactionInputChange={handleReactionInputChange}
             onExpectationChange={setExpectation}
             onRun={runFeedback}
           />
