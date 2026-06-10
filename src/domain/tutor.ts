@@ -14,6 +14,10 @@ function correctionFor(evaluation: ExpectationEvaluation): string {
   }
 
   if (evaluation.status === "partial") {
+    if (evaluation.matchedObservations.length === 0) {
+      return "你已经写出了预测，但它还没有命中这个实验的关键证据。可以回到气泡、颜色变化、沉淀、放热或复燃等可观察现象。";
+    }
+
     return `你的预测已经命中 ${evaluation.matchedObservations.join("、")}，还需要补充 ${evaluation.missingObservations.join("、")}。`;
   }
 
