@@ -51,6 +51,14 @@ export function generateLearningReflection(
   }
 
   if (evaluation.status === "partial") {
+    if (evaluation.matchedObservations.length === 0) {
+      return {
+        insight: `你的预测还没有连接到关键证据，实验结论需要先被可观察现象支持。`,
+        nextStep: `下次先观察气体、颜色、沉淀、温度、火焰或固体变化等证据，再写出结论。`,
+        skillTags: tagsFor(experiment, evaluation)
+      };
+    }
+
     return {
       insight: `你抓住了一部分证据，但完整实验记录还需要补齐其他关键现象。`,
       nextStep: `下次实验记录时按“我看到了什么、说明了什么、还需要什么证据”三步来写。`,
