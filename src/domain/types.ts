@@ -93,3 +93,39 @@ export interface VisualTimelineStep {
   knowledgeTag: string;
   scene: VisualSceneState;
 }
+
+export type ReviewStatus = "new" | "due" | "mastered";
+
+export interface RecallPrompt {
+  question: string;
+  answer: string;
+}
+
+export interface MisconceptionPrompt {
+  statement: string;
+  isCorrect: boolean;
+  explanation: string;
+}
+
+export interface ShortAnswerPrompt {
+  question: string;
+  answer: string;
+}
+
+export interface MemoryCard {
+  id: string;
+  experimentId: string;
+  experimentTitle: string;
+  createdAt: number;
+  lastReviewedAt?: number;
+  status: ReviewStatus;
+  keyPhenomena: string[];
+  equation: string;
+  principle: string;
+  misconception: string;
+  safety: string;
+  mnemonic: string;
+  recallPrompts: RecallPrompt[];
+  misconceptionPrompt: MisconceptionPrompt;
+  shortAnswerPrompt: ShortAnswerPrompt;
+}
