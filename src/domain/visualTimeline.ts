@@ -242,7 +242,7 @@ const visualTimelines: Record<string, VisualTimelineStep[]> = {
         turbidity: "clear",
         solid: "manganese-dioxide",
         colorChange: "none",
-        flame: "ember",
+        flame: "none",
         temperature: "normal",
       },
     },
@@ -260,7 +260,7 @@ const visualTimelines: Record<string, VisualTimelineStep[]> = {
         turbidity: "clear",
         solid: "manganese-dioxide",
         colorChange: "none",
-        flame: "ember",
+        flame: "none",
         temperature: "normal",
       },
     },
@@ -302,6 +302,10 @@ const visualTimelines: Record<string, VisualTimelineStep[]> = {
     },
   ],
 };
+
+export function hasCuratedVisualTimeline(experimentId: string): boolean {
+  return Object.hasOwn(visualTimelines, experimentId);
+}
 
 export function createVisualTimeline(experiment: Experiment): VisualTimelineStep[] {
   return (

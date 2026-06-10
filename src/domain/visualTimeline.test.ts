@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { experiments } from "./experiments";
-import { createVisualTimeline } from "./visualTimeline";
+import { createVisualTimeline, hasCuratedVisualTimeline } from "./visualTimeline";
 
 describe("createVisualTimeline", () => {
+  it("has a curated visual timeline for every current experiment", () => {
+    expect(experiments.every((experiment) => hasCuratedVisualTimeline(experiment.id))).toBe(true);
+  });
+
   it("creates at least three visual states for each experiment", () => {
     for (const experiment of experiments) {
       const timeline = createVisualTimeline(experiment);
@@ -38,5 +42,28 @@ describe("createVisualTimeline", () => {
     ).toBe(true);
     expect(timeline.some((step) => step.scene.temperature === "warm")).toBe(true);
     expect(timeline.map((step) => step.observationCue).join(" ")).toContain("无气泡");
+  });
+
+  it("shows iron replacing copper sulfate with red copper coating and blue fade", () => {
+    const experiment = experiments.find((item) => item.id === "iron-copper-sulfate");
+    expect(experiment).toBeDefined();
+
+    const timeline = createVisualTimeline(experiment!);
+    const cues = timeline.map((step) => step.observationCue).join(" ");
+
+    expect(timeline.some((step) => step.scene.solid === "copper-coating")).toBe(true);
+    expect(timeline.some((step) => step.scene.colorChange === "blue-fade")).toBe(true);
+    expect(cues).toMatch(/红色|铜/);
+  });
+
+  it("shows oxygen bubbles before rekindling the splint only at the test step", () => {
+    const experiment = experiments.find((item) => item.id === "oxygen-preparation");
+    expect(experiment).toBeDefined();
+
+    const timeline = createVisualTimeline(experiment!);
+
+    expect(timeline.some((step) => step.scene.bubbleIntensity === "strong")).toBe(true);
+    expect(timeline.filter((step) => step.scene.flame === "rekindled").map((step) => step.phase)).toEqual(["test"]);
+    expect(timeline.filter((step) => step.phase !== "test").every((step) => step.scene.flame === "none")).toBe(true);
   });
 });
